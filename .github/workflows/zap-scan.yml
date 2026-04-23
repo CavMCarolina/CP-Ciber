@@ -2,10 +2,10 @@ name: Security Scan - OWASP ZAP
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:  # Permite rodar manualmente
+    branches: [main, master]
+  workflow_dispatch: # Permite rodar manualmente
 
 jobs:
   zap-security-scan:
@@ -25,7 +25,7 @@ jobs:
       - name: Configurar Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Instalar dependências da aplicação
         run: |
@@ -47,14 +47,20 @@ jobs:
       #    - Gera relatório HTML
       #    - Usa a action oficial do ZAP
       # ─────────────────────────────────────────
+      - name: Corrigir permissões para o ZAP
+        run: |
+          mkdir -p zap-wrk
+          chmod 777 zap-wrk
+
       - name: Executar OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          target: 'http://localhost:8080'
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'           # Inclui scan adicional
-          fail_action: false          # Não falha aqui — vamos avaliar manualmente abaixo
-        continue-on-error: true       # Continua para checar severidade
+          target: "http://localhost:8080"
+          rules_file_name: ".zap/rules.tsv"
+          cmd_options: "-a" # Inclui scan adicional
+          fail_action: false # Não falha aqui — vamos avaliar manualmente abaixo
+          allow_issue_writing: false # Evita erro de permissão ao criar issues
+        continue-on-error: true # Continua para checar severidade
         id: zap_scan
 
       # ─────────────────────────────────────────
@@ -109,7 +115,7 @@ jobs:
       # ─────────────────────────────────────────
       - name: Salvar relatório ZAP como artefato
         uses: actions/upload-artifact@v4
-        if: always()   # Salva mesmo se o pipeline falhar
+        if: always() # Salva mesmo se o pipeline falhar
         with:
           name: zap-security-report-${{ github.run_number }}
           path: |
