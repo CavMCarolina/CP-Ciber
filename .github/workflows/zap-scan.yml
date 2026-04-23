@@ -60,6 +60,7 @@ jobs:
           cmd_options: "-a" # Inclui scan adicional
           fail_action: false # Não falha aqui — vamos avaliar manualmente abaixo
           allow_issue_writing: false # Evita erro de permissão ao criar issues
+          artifact_name: zap-baseline-report # Corrige nome inválido do artefato interno
         continue-on-error: true # Continua para checar severidade
         id: zap_scan
 
@@ -118,6 +119,7 @@ jobs:
         if: always() # Salva mesmo se o pipeline falhar
         with:
           name: zap-security-report-${{ github.run_number }}
+          overwrite: true
           path: |
             report_html.html
             report_json.json
